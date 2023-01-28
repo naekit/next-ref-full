@@ -1,5 +1,6 @@
 import React from "react"
 import MeetupList from "../components/meetups/MeetupList"
+import { MongoClient } from "mongodb"
 
 const SampleEvents = [
 	{
@@ -43,11 +44,24 @@ const HomePage = (props) => {
 
 export async function getStaticProps() {
 	// Fetch data from an API
+	const client = await MongoClient.connect(
+		`mongodb+srv://natkha:potemkin99@cluster0.mqi9zgw.mongodb.net/nextref?retryWrites=true&w=majority`
+	)
+	const db = client.db()
+	const eventsCollection = db.collection("events")
+
+	const events = await eventsCollection.find().toArray()
+
 	return {
 		props: {
-			events: SampleEvents,
+			events: events.map((event) => ({
+				title: event.title,
+				address: event.address,
+				image: event.image,
+				id: event._id.toString(),
+			})),
 		},
-		// revalidate: 1,
+		revalidate: 1,
 	}
 }
 
