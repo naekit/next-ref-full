@@ -1,3 +1,4 @@
+import Head from "next/head"
 import { useRouter } from "next/router"
 import React from "react"
 import NewMeetupForm from "../../components/meetups/NewMeetupForm"
@@ -22,6 +23,13 @@ const NewEventPage = () => {
 
 	return (
 		<>
+			<Head>
+				<title>Add a New Event</title>
+				<meta
+					name="description"
+					content="Add your own events and create amazing networking opportunities."
+				/>
+			</Head>
 			<NewMeetupForm onAddMeetup={addMeetupHandler} />
 		</>
 	)

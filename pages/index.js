@@ -1,5 +1,6 @@
 import React from "react"
 import MeetupList from "../components/meetups/MeetupList"
+import Head from "next/head"
 import { MongoClient } from "mongodb"
 
 const SampleEvents = [
@@ -27,7 +28,18 @@ const SampleEvents = [
 ]
 
 const HomePage = (props) => {
-	return <MeetupList meetups={props.events} />
+	return (
+		<>
+			<Head>
+				<title>React Events</title>
+				<meta
+					name="description"
+					content="Browse a huge list of highly active React meetups!"
+				/>
+			</Head>
+			<MeetupList meetups={props.events} />
+		</>
+	)
 }
 
 // export async function getServerSideProps(context) {

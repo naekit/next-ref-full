@@ -1,26 +1,42 @@
 import React from "react"
 import MeetupDetails from "../../components/meetups/MeetupDetails"
+import { MongoClient, ObjectId } from "mongodb"
+import Head from "next/head"
 
 const EventDetails = (props) => {
 	return (
 		<>
+			<Head>
+				<title>{props.eventData.title}</title>
+				<meta
+					name="description"
+					content={props.eventData.description}
+				/>
+			</Head>
 			<MeetupDetails
-				image={props.image}
-				title={props.title}
-				address={props.address}
-				description={props.description}
+				image={props.eventData.image}
+				title={props.eventData.title}
+				address={props.eventData.address}
+				description={props.eventData.description}
 			/>
 		</>
 	)
 }
 
 export async function getStaticPaths() {
+	const client = await MongoClient.connect(
+		`mongodb+srv://natkha:potemkin99@cluster0.mqi9zgw.mongodb.net/nextref?retryWrites=true&w=majority`
+	)
+	const db = client.db()
+	const eventsCollection = db.collection("events")
+
+	const events = await eventsCollection.find({}, { _id: 1 }).toArray()
+
+	client.close()
 	return {
-		paths: [
-			{ params: { eventId: "e1" } },
-			{ params: { eventId: "e2" } },
-			{ params: { eventId: "e3" } },
-		],
+		paths: events.map((event) => ({
+			params: { eventId: event._id.toString() },
+		})),
 		fallback: false,
 	}
 }
@@ -29,17 +45,26 @@ export async function getStaticProps(context) {
 	// Fetch data from an API
 	const eventId = context.params.eventId
 
-	console.log(eventId)
+	const client = await MongoClient.connect(
+		`mongodb+srv://natkha:potemkin99@cluster0.mqi9zgw.mongodb.net/nextref?retryWrites=true&w=majority`
+	)
+	const db = client.db()
+	const eventsCollection = db.collection("events")
+
+	const eventData = await eventsCollection.findOne({ _id: ObjectId(eventId) })
+
+	client.close()
 
 	return {
 		props: {
-			id: eventId,
-			image: "https://images.unsplash.com/photo-1530743373890-f3c506b0b5b1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1535&q=80",
-			title: "First EVENT",
-			address: "2883 main",
-			description: "Description of EVENT",
+			eventData: {
+				id: eventData._id.toString(),
+				title: eventData.title,
+				image: eventData.image,
+				address: eventData.address,
+				description: eventData.description,
+			},
 		},
-		revalidate: 1,
 	}
 }
 
