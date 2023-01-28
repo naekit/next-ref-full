@@ -25,8 +25,17 @@ const SampleEvents = [
 	},
 ]
 
-const HomePage = () => {
-	return <MeetupList meetups={SampleEvents} />
+const HomePage = (props) => {
+	return <MeetupList meetups={props.events} />
+}
+
+export function getStaticProps() {
+	// Fetch data from an API
+	return {
+		props: {
+			events: SampleEvents,
+		},
+	}
 }
 
 export default HomePage
